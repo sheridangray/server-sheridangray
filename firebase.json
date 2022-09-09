@@ -1,19 +1,4 @@
 {
-  "database": {
-    "rules": "database.rules.json"
-  },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  },
   "functions": {
     "ignore": [
       "node_modules",
@@ -21,8 +6,12 @@
       "firebase-debug.log",
       "firebase-debug.*.log"
     ],
-    "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint"
-    ]
+    "predeploy": [],
+    "source": "functions"
+  },
+  "emulators": {
+    "functions": {
+      "host": "127.0.0.1"
+    }
   }
 }

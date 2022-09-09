@@ -1,9 +1,17 @@
 const functions = require("firebase-functions");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const api = require("./api");
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+dotenv.config({ path: "./config.env" });
+
+const DB = process.env.DATABASE.replace(
+  "<PASSWORD>",
+  process.env.DATABASE_PASSWORD
+);
+
+mongoose.connect(DB).then(() => {
+  console.log("DB connection successful.");
+});
+
+exports.api = functions.https.onRequest(api);
