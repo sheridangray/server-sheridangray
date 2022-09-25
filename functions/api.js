@@ -21,7 +21,7 @@ api.use((req, res, next) => {
 
 // ROUTES
 
-api.use("/v1/recipies", recipeRouter);
+api.use("/v1/recipes", recipeRouter);
 api.use("/v1/users", userRouter);
 
 module.exports = api;

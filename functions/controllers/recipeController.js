@@ -1,23 +1,35 @@
 const Recipe = require("../models/recipeModel");
+const APIFeatures = require("./../utils/apiFeatures");
 
-exports.getAllRecipies = async (req, res) => {
+exports.aliasTopRecipes = async (req, res, next) => {
+  req.query.limit = "5";
+  req.query.sort = "-caloriesPerServing";
+  req.query.fields = "name,description,caloriesPerServing";
+  next();
+};
+
+exports.getAllRecipes = async (req, res) => {
   try {
-    const queryObj = { ...req.query };
-    const excludedFields = ["page", "sort", "limit", "fields"];
-    excludedFields.forEach((el) => delete queryObj[el]);
+    // EXECUTE THE QUERY
+    const features = new APIFeatures(Recipe.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const recipes = await features.query;
 
-    const recipies = await Recipe.find(req.query);
+    // SEND RESPONSE
 
     res.status(200).json({
       status: "success",
       requestedAt: req.requestTime,
-      results: recipies.length,
+      results: recipes.length,
       data: {
-        recipies,
+        recipes,
       },
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(404).json({
       status: "fail",
       message: err,
     });
@@ -87,6 +99,35 @@ exports.deleteRecipe = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({
+      status: "fail",
+      message: err,
+    });
+  }
+};
+
+exports.getRecipeStats = async (req, res) => {
+  console.log("getting stats");
+  try {
+    const stats = await Recipe.aggregate([
+      {
+        $match: { caloriesPerServing: { gt: 0 } },
+      },
+      {
+        $group: {
+          _id: null,
+          numRecipes: { $sum: 1 },
+          averageCalories: { $avg: "$caloriesPerServing" },
+          minCalories: { $min: "$caloriesPerServing" },
+          maxCalories: { $max: "$caloriesPerServing" },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: { stats },
+    });
+  } catch (err) {
+    res.status(404).json({
       status: "fail",
       message: err,
     });
