@@ -18,6 +18,8 @@ exports.getAllRecipes = async (req, res) => {
       .paginate();
     const recipes = await features.query;
 
+    console.log(recipes);
+
     // SEND RESPONSE
 
     res.status(200).json({
